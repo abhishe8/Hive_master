@@ -1,0 +1,106 @@
+Create Table:
+
+In Hive we have 2 types of tables:
+
+	1. Internal Table
+
+Hive is the soul owner of both 'Data' and 'Metadata'. By default hive create internal table.
+If we drop internal table, both data and metadata will be lost.
+
+
+create table if not exists table3(col1 int,col2 array<string>,col3 string,col4 int)row format delimited fields terminated by',' collection items terminated by':' lines terminated by'\n' stored as textfile;
+
+
+	2. External Table
+
+In external table, hive is only responsible for a table's metadata.
+If we drop external table, only metadata will be lost. In HDFS data will be still there.
+
+
+create external table if not exists table2(col1 int,col2 array<string>,col3 string,col4 int)row format delimited fields terminated by',' collection items terminated by':' lines terminated by'\n' stored as textfile location'/user/jivesh/emp';
+
+
+If we don't mention "row format delimited fields terminated by',' collection items terminated by':' lines terminated by'\n' stored as textfile location'/user/jivesh/emp'" then default parameter is used.
+
+• To load data in a table
+load data local inpath'/home/jivesh/files/table1'into table table2;
+		or
+load data inpath'/home/jivesh/files/table1'into table table2;
+
+Here we are using 'local' keyword as it is stored in local not in HDFS.
+'into' is used to append the data in the table.
+'overwrite' is used to remove the previous data and add new data in the table.
+
+
+To drop a table.
+Drop table table1;
+(In hive browser table1 is still available. Data is present, only metadata is lost.)
+
+
+set hive.metastore.warehouse.dir;
+
+This will give default directory path for metastore. Default directory (user/hive/datawarehouse/) is present in the HDFS. But this directory fully controlled by Hive.
+
+select * from table1; 
+To check the data if it is loaded successfully or not.
+
+
+set hive.cli.print.header = true;
+This property is use to set header in the table.
+
+
+#To insert data in a table
+
+Insert into table tab select col1, col2,col3 from emp_tab;
+
+Insert overwrite table tab select col1,col2,col3 from emp_tmp where col3 = 'Developer';
+
+
+
+
+MultiInsert :
+
+Create table developer_tab( ID int, name string, desg string) stored as textfile;
+
+create table manager_tab(ID int, name string, desg string) stored as textfile;
+
+#same file can be loaded in different table as per condition.
+
+From emp_tab insert into table developer_tab select col1, col2, col3 where col3 = 'Developer' 
+insert into table manager_tab select col1, col2, col3 where col3 = 'Mgr';
+
+
+
+Alter:
+
+desc tab;
+
+alter table tab add columns( col4 string, col5 string);
+
+alter table tab change col1 col1 int after col3;
+
+alter table tab change column col2 new_col2 string;
+
+alter table tab rename to tab1;
+
+alter table tab1 replace columns(id int, name string);
+--> Now we only have 2 columns which are mentioned.
+
+
+
+Table Properties:
+
+Create table test1(col1 int, col2 string, col3 string) stored as textfile tblproperties("skip.header.line.count"="3");
+
+desc formatted tab1;
+
+
+alter table tab1 set tblproperties('auto.purge'='true');
+so that we can read easily.
+
+
+alter table tab1 set fileformat avro;
+desc formatted tab1;
+
+
+

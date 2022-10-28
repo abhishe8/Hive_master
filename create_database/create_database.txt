@@ -1,0 +1,37 @@
+In Hive, we create Database (Metastore) to store the metadata of the table.
+
+
+• How to create a database / DB?
+
+CREATE database <database_name>;
+
+	or
+
+CREATE database if not exists <database_name>;
+
+( Using if not exists is optional command, it can be used when you do not know if database is already present or not. )
+
+	or
+
+create database if not exists <database_name> comment 'this is a database';
+( Comment is used to add information about the database )
+
+	or
+create database if not exists <database_name> with dbproperties('creator' = 'Anupriya', 'date' = '2022-10-27'
+
+
+
+• To check database detail of a particular database. 
+details like DB_name, comment, location, owner_name, owner_type, parameters.
+
+Describe database extended <database_name>;
+
+• To check the databases list.
+
+show databases;
+
+• To use a database.
+
+use <db_name>;
+
+( While creating table if you don't mention db name then it will be stored in 'default' directory.)
