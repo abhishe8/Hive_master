@@ -1,0 +1,91 @@
+Date Functions:
+---------------------------------------------------------------------------------------------
+#to fetch the seconds differnce between date/date_timestamp and the unix time epoch(i.e; set to 1970-01-01 00:00:00)
+Select unix_timestamp('date')
+#to fetch date from seconds which is calculated from 1970-01-01 00:00:00
+Select from_unix_timestamp(123456);
+#to fetch date from date/date_timestamp
+TO_DATE('1970-01-01 00:10:30') returns '1970-01-01'
+#to fetch year from date/date_timestamp
+YEAR('1970-01-01 00:10:30') returns 1997
+similarly we have Month(), Day(), Hour(), Minute(), Second()
+#returns week number from the year
+Weekofyear('date/date_timestamp') 
+#returns no of days between 2 given dates 
+Datediff('date1', 'date2') 
+#to add no of days to a date
+Date_add(date, days)
+#to subtract no of days from a date
+Date_sub(date, days)
+
+
+Mathematical Functions:
+-------------------------------------------------------------
+Ceil(value) -> returns smallest integer greater than the value passes  
+select Ceil(9.5) ---10
+Floor(value) -> returns greatest number smaller than the value passes 
+select Floor(10.9)---10
+Round(value, decimaldigits)
+Rand()
+
+
+String Functions:
+--------------------------------------------------------------
+Concat()
+Length(string)
+Lower(string), Upper(string)
+Lpad(string,length,stringtopad), rpad(col,length,stringtopad)
+Trim(string), ltrim(string), rtrim(string)
+Repeat(string, no_of_times)
+Reverse(string)
+split(string, char)
+substr(string, start_index(from 1) , length-optional)
+instr(string, char) #returns index of 1st occurrence of char
+
+
+Conditional Functions:
+--------------------------------------------------------------
+If(cond, TrueVal, FalseVal)
+Case Col When Val then TrueVal else FalseVal end
+Case When Col= Val then TrueVal else FalseVal end
+
+Isnull(col) #returns Boolean val
+Isnotnull(col)
+
+Coalesce(col1,col2,col3) #selects 1st not null value of given input 
+NVL(col1,col2) #if col1 is null the fetches col2
+
+Explode()  - converts col with array into individual rows
+Select explode(col) from tab;
+Here we can only select the col which needs to be exploded, we cant fetch other cols in select clause.
+so we have 
+'LateralView' - 
+*Helps us in selecting any no of cols along with col to be exploded as hive internally creates virtual table with exploded col that helps to join with our base table of other columns
+Select col1, dummy_col from tname lateral view explode(col2) virtual_tname as dummy_col; -> that is col2 is exploded to sep rows into dummy table in col named dummy_col
+*Also helps in separating k,v pairs into diff cols
+Select key,value from tab later view explode(col) dummy as key,value; #here col - is dict
+
+
+Rlike:
+--------------------------------------------------------------
+similar to like but we need not have '%' to match
+Select ‘string’ rlike ‘ha’;
+select * from Student where name rlike  "^[AEIOUaeiou]"; name startswith vowel
+select * from Student where name rlike  "[AEIOUaeiou]$"; name endswith vowel
+select * from Student where name rlike  "^[^AEIOUaeiou]"; #names doesn’t start with vowel
+select * from Student where name rlike  "^A|^S";
+select * from Student where name rlike  "a..m"; starts with a and ends with m with 2 chars in b/w
+SELECT  'Java' RLIKE '^C | e$' AS 'RLIKE', 'Javatpoint' NOT RLIKE '^C | e$' AS 'NOT RLIKE';   #o/p: 0,1
+
+
+Ranks:
+--------------------------------------------------------------
+RANK() - ranking within ordered partition, if there are ties in multiple rows then it assigns same ranks but skips rank for next sequence of records 
+skips the next N-1 ranks if there is a tie between N previous ranks. 
+DENSE_RANK() - same like rank but if there are ties it doesnt skip ranks
+ROW_NUMBER() - returns the row number of the sorted records and doesn't bother even if any duplicate record is found
+ex:
+select col1,col2, RANK() over(order by col2 desc) from table;
+select * from(select *, dense_rank() over(Partition By dept order by salary desc) as rnk from dept)t where rnk=1;
+
+
