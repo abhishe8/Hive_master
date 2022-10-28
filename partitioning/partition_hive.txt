@@ -1,0 +1,95 @@
+what is partition in hive ?
+
+Partitioning is a way of dividing a table into related parts based on the values of particular columns like date, city, and department.
+Each table in the hive can have one or more partition keys to identify a particular partition.
+Using partition it is easy to do queries on slices of the data.
+
+Thier are two types of partitioning in hive.
+1) static partition
+2) Dynamic partition
+
+Static partition
+------------------
+
+Insert input data files individually into a partition table is Static Partition.
+
+Example :
+	
+	No partiiton table
+	-------------------
+	
+	create table if not exists dept
+	(col1 int,col2 string,col3 string,col4 int)
+	row format delimited fields terminated by','
+	lines terminated by'\n'
+	stored as textfile;
+	
+	Partitioned table
+	-------------------
+	
+	create table if not exists part_dept
+	(deptno int,empname string,sal int)
+	partitioned by (deptname string)
+	row format delimited fields terminated by','
+	lines terminated by'\n'
+	stored as textfile;
+	
+	Static partitioning Load
+	------------------------
+	Insert statement
+	-----
+	insert into table part_dept partition (deptname = 'HR') select col1,col3,col4 from dept where col2 = 'HR'; 
+	
+	Load statement
+	-----
+	load data local inpath'/home/jivesh/act' into table part_tab partition( deptname ='XZ');
+	
+
+Dynamic partition
+------------------
+
+Single insert to partition table is known as a dynamic partition.
+
+set parameter to enable Dynamic partition.
+-------------
+# set hive.exec.dynamic.partition=true;    
+# set hive.exec.dynamic.partition.mode=nonstrict;  
+
+
+Example:
+		
+	 Dynamic partition
+	 -----------------
+	 
+	 create table if not exists part_dept1
+	 (deptno int,empname string,sal int)
+	 partitioned by (deptname string)
+	 row format delimited fields terminated by','
+	 lines terminated by'\n'
+	 stored as textfile;
+	 
+	 Dynamic partitioning Load
+	 -------------------
+	 
+	 # in the select statement we have to keep the partiiton col at the end. e.g. col2
+	 
+	 insert into table part_dept1 partition (deptname) select col1,col3,col4,col2 from dept; 
+	 
+	 
+
+Display partition in table
+-----------------
+
+show partitions table_name;
+
+# this will display all the partiitons in the table.
+
+drop partition
+alter table part_dept1 drop partition (deptname = 'HR');
+
+Add partition
+alter table part_dept1 add partition (deptname = 'Dev');
+
+load data local inpath'/home/jivesh/dev'into table part_dept1 partition( deptname ='Dev');
+
+msck repair table part_dept1;
